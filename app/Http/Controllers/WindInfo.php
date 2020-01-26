@@ -7,7 +7,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class WindInfo extends Controller
 {
@@ -61,12 +60,11 @@ class WindInfo extends Controller
                 'direction' => $body['wind']['deg'],
             ];
         } catch (ClientException $ex) {
-            Log::debug($ex);
             $out = [
                 'request' =>  Psr7\str($e->getRequest()),
                 'response' => Psr7\str($e->getResponse()),
-                'status' => Psr7\str($e->getStatus()),
             ];
+            $response->withStatus($e->getStatusCode());
         }
 
         return $response->json($out);

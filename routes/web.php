@@ -15,5 +15,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/wind/{zipCode}', 'WindInfo')
+Route::get('/api/v1/wind/{zipCode}', 'WindInfo')
     ->where(['zipCode' => '\d\d\d\d\d(-\d\d\d\d)?']);

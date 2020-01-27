@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\Wind;
+use App\Wind;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class WindInfo extends Controller
 {
@@ -54,11 +55,10 @@ class WindInfo extends Controller
                 ] ,
             ]);
             $body = json_decode($weatherInfo->getBody()->getContents(), true);
-
-            $out = [
-                'speed' => $body['wind']['speed'],
-                'direction' => $body['wind']['deg'],
-            ];
+            Log::info($body);
+            $wind = new Wind();
+            $wind->setDirectionAttribute($body['wind']['deg']);
+            $wind->setSpeedAttribute($body['wind']['speed']);
         } catch (ClientException $ex) {
             $out = [
                 'request' =>  Psr7\str($e->getRequest()),
@@ -67,6 +67,6 @@ class WindInfo extends Controller
             $response->withStatus($e->getStatusCode());
         }
 
-        return $response->json($out);
+        return $response->json($wind);
     }
 }

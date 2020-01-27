@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class WindInfo extends Controller
@@ -47,24 +48,27 @@ class WindInfo extends Controller
     {
         $response = response();
 
-        try {
-            $weatherInfo = $this->client->request('GET', '/data/2.5/weather', [
-                'query' => [
-                    'zip' => "{$zipCode},us",
-                    'APPID' => static::API_ID,
-                ] ,
-            ]);
-            $body = json_decode($weatherInfo->getBody()->getContents(), true);
-            Log::info($body);
-            $wind = new Wind();
-            $wind->fill($body['wind']);
-        } catch (ClientException $ex) {
-            $out = [
-                'request' =>  Psr7\str($e->getRequest()),
-                'response' => Psr7\str($e->getResponse()),
-            ];
-            $response->withStatus($e->getStatusCode());
-        }
+        $wind = Cache::remember("wind-{$zipCode}", 15, function () use ($zipCode, $response) {
+            try {
+                $weatherInfo = $this->client->request('GET', '/data/2.5/weather', [
+                    'query' => [
+                        'zip' => "{$zipCode},us",
+                        'APPID' => static::API_ID,
+                    ] ,
+                ]);
+                $body = json_decode($weatherInfo->getBody()->getContents(), true);
+
+                $wind = new Wind();
+                $wind->fill($body['wind']);
+            } catch (ClientException $ex) {
+                $wind = [
+                    'request' =>  Psr7\str($e->getRequest()),
+                    'response' => Psr7\str($e->getResponse()),
+                    'statuscode' => Psr7\str($e->getStatusCode()),
+                ];
+            }
+            return $wind;
+        });
 
         return $response->json($wind);
     }

@@ -9,33 +9,33 @@ class Wind extends Model
     /**
      * @var array
      */
-    protected $fillable = [ 'direction', 'speed' ];
+    protected $fillable = [ 'deg', 'speed' ];
 
     protected $casts = [
-        'direction' => 'int',
+        'deg' => 'int',
         'speed' => 'float',
     ];
 
     /**
-     * Getter for 'direction' attribute.
+     * Getter for 'deg' attribute.
      *
      * @return int
      */
-    public function getDirectionAttribute(): int
+    public function getDegAttribute(): int
     {
-        return $this->attributes['direction'];
+        return $this->attributes['deg'];
     }
 
     /**
-     * Setter for 'direction' attribute
+     * Setter for 'deg' attribute
      *
-     * @param int $direction
+     * @param int $deg
      *
      * @return void
      */
-    public function setDirectionAttribute(int $direction): void
+    public function setDegAttribute(int $deg): void
     {
-        $this->attributes['direction'] = $direction;
+        $this->attributes['deg'] = $deg;
     }
 
     /**

@@ -57,8 +57,7 @@ class WindInfo extends Controller
             $body = json_decode($weatherInfo->getBody()->getContents(), true);
             Log::info($body);
             $wind = new Wind();
-            $wind->setDirectionAttribute($body['wind']['deg']);
-            $wind->setSpeedAttribute($body['wind']['speed']);
+            $wind->fill($body['wind']);
         } catch (ClientException $ex) {
             $out = [
                 'request' =>  Psr7\str($e->getRequest()),
